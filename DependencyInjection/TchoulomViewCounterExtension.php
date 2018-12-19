@@ -34,9 +34,9 @@ class TchoulomViewCounterExtension extends Extension
     public function load(array $configs, ContainerBuilder $container)
     {
         $configuration = new Configuration();
-        $configs = $this->beforeProcess($configs);
-        $container->setParameter('view_interval', $configs);
-        $config = $this->processConfiguration($configuration, $configs);
+        $viewIntervals = $this->beforeProcess($configs);
+        $container->setParameter('view_interval', $viewIntervals);
+        $this->processConfiguration($configuration, $configs);
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
@@ -53,14 +53,14 @@ class TchoulomViewCounterExtension extends Extension
     public function beforeProcess($configs)
     {
         $uniqueElt = [];
-        $viewInterval = $configs[0]['view_interval'];
-        $firstInterval = $viewInterval[0];
 
-        if (null == $firstInterval) {
+        $viewInterval = $configs[0]['view_interval'];
+
+        if (empty($viewInterval)) {
             throw new RuntimeException(vsprintf('You must choose one of the following values: %s, %s, %s, %s.', TchoulomViewCounterBundle::SUPPORTED_INTERVAL));
         }
 
-        foreach ($firstInterval as $key => $config) {
+        foreach ($viewInterval as $key => $config) {
             if (!in_array($key, TchoulomViewCounterBundle::SUPPORTED_INTERVAL)) {
                 throw new RuntimeException(sprintf('The key "%s" is not supported.', $key) . vsprintf('You must choose one of the following values: %s, %s, %s, %s.', TchoulomViewCounterBundle::SUPPORTED_INTERVAL));
             }
